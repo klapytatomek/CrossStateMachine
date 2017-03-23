@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using QuickStateMachine.StateMachine.Abstraction;
 using QuickStateMachine.StateMachine.Attributes;
 using QuickStateMachine.StateMachine.Exceptions;
 
@@ -55,28 +56,20 @@ namespace QuickStateMachine.StateMachine.Execution
             var type = sender.GetType();
             if (!_handlers.ContainsKey(type)) return;
 
+            var handlersToExecute = new List<IStateHandlerAbstractionBase>();
             if (_handlers[type].Exits.ContainsKey(_currentStates[sender]))
-            {
-                var exit = _handlers[type].Exits[_currentStates[sender]];
-                if (exit != null)
-                    foreach (var stateHandlerInvoker in exit)
-                        stateHandlerInvoker.Execute(sender);
-            }
+                handlersToExecute.AddRange(_handlers[type].Exits[_currentStates[sender]]);
 
             var key = new KeyValuePair<string, string>(_currentStates[sender], state);
             if (_handlers[type].Transitions.ContainsKey(key))
-            {
-                var transition = _handlers[type].Transitions[key];
-                if (transition != null)
-                    foreach (var stateHandlerInvoker in transition)
-                        stateHandlerInvoker.Execute(sender);
-            }
+                handlersToExecute.AddRange(_handlers[type].Transitions[key]);
+
             if (_handlers[type].Enters.ContainsKey(state))
+                handlersToExecute.AddRange(_handlers[type].Enters[state]);
+
+            foreach (var stateHandlerAbstractionBase in handlersToExecute)
             {
-                var enter = _handlers[type].Enters[state];
-                if (enter != null)
-                    foreach (var stateHandlerInvoker in enter)
-                        stateHandlerInvoker.Execute(sender);
+                stateHandlerAbstractionBase.AbstractExecute(sender);
             }
 
             _currentStates[sender] = state;
@@ -119,19 +112,11 @@ namespace QuickStateMachine.StateMachine.Execution
                 {
                     var enterStateAttribute = x.GetCustomAttribute<StateMachineEnterStateAttribute>();
                     var type = x.Assembly.GetType(x.FullName);
-                    var innerType = type.GetTypeInfo()
-                        .ImplementedInterfaces.FirstOrDefault()
-                        .GetTypeInfo()
-                        .GenericTypeArguments.FirstOrDefault();
                     return new
                     {
                         EntersState = enterStateAttribute.State,
-                        HandlerFor = innerType,
-                        Handler = Activator.CreateInstance(type),
-                        HandlerMethod = type.GetRuntimeMethod("Execute", new[]
-                        {
-                            innerType
-                        })
+                        HandlerFor = enterStateAttribute.Target,
+                        Handler = Activator.CreateInstance(type) as IStateHandlerAbstractionBase
                     };
                 }).ToList();
 
@@ -142,13 +127,9 @@ namespace QuickStateMachine.StateMachine.Execution
 
                 if (!_handlers[enter.HandlerFor].Enters.ContainsKey(enter.EntersState))
                     _handlers[enter.HandlerFor].Enters.Add(enter.EntersState,
-                        new HashSet<StateHandlerInvoker>());
+                        new HashSet<IStateHandlerAbstractionBase>());
 
-                _handlers[enter.HandlerFor].Enters[enter.EntersState].Add(new StateHandlerInvoker
-                {
-                    Handler = enter.Handler,
-                    HandlerMethod = enter.HandlerMethod
-                });
+                _handlers[enter.HandlerFor].Enters[enter.EntersState].Add(enter.Handler);
             }
         }
 
@@ -160,19 +141,11 @@ namespace QuickStateMachine.StateMachine.Execution
                 {
                     var exitStateAttribute = x.GetCustomAttribute<StateMachineExitStateAttribute>();
                     var type = x.Assembly.GetType(x.FullName);
-                    var innerType = type.GetTypeInfo()
-                        .ImplementedInterfaces.FirstOrDefault()
-                        .GetTypeInfo()
-                        .GenericTypeArguments.FirstOrDefault();
                     return new
                     {
                         ExitState = exitStateAttribute.State,
-                        HandlerFor = innerType,
-                        Handler = Activator.CreateInstance(type),
-                        HandlerMethod = type.GetRuntimeMethod("Execute", new[]
-                        {
-                            innerType
-                        })
+                        HandlerFor = exitStateAttribute.Target,
+                        Handler = Activator.CreateInstance(type) as IStateHandlerAbstractionBase
                     };
                 }).ToList();
 
@@ -183,13 +156,9 @@ namespace QuickStateMachine.StateMachine.Execution
 
                 if (!_handlers[exit.HandlerFor].Exits.ContainsKey(exit.ExitState))
                     _handlers[exit.HandlerFor].Exits.Add(exit.ExitState,
-                        new HashSet<StateHandlerInvoker>());
+                        new HashSet<IStateHandlerAbstractionBase>());
 
-                _handlers[exit.HandlerFor].Exits[exit.ExitState].Add(new StateHandlerInvoker
-                {
-                    Handler = exit.Handler,
-                    HandlerMethod = exit.HandlerMethod
-                });
+                _handlers[exit.HandlerFor].Exits[exit.ExitState].Add(exit.Handler);
             }
         }
 
@@ -201,20 +170,12 @@ namespace QuickStateMachine.StateMachine.Execution
                 {
                     var transitStateAttribute = x.GetCustomAttribute<StateMachineTransitionAttribute>();
                     var type = x.Assembly.GetType(x.FullName);
-                    var innerType = type.GetTypeInfo()
-                        .ImplementedInterfaces.FirstOrDefault()
-                        .GetTypeInfo()
-                        .GenericTypeArguments.FirstOrDefault();
                     return new
                     {
                         ExitState = transitStateAttribute.FromState,
                         EnterState = transitStateAttribute.ToState,
-                        HandlerFor = innerType,
-                        Handler = Activator.CreateInstance(type),
-                        HandlerMethod = type.GetRuntimeMethod("Execute", new[]
-                        {
-                            innerType
-                        })
+                        HandlerFor = transitStateAttribute.Target,
+                        Handler = Activator.CreateInstance(type) as IStateHandlerAbstractionBase
                     };
                 }).ToList();
 
@@ -226,13 +187,9 @@ namespace QuickStateMachine.StateMachine.Execution
 
                 if (!_handlers[transition.HandlerFor].Transitions.ContainsKey(key))
                     _handlers[transition.HandlerFor].Transitions.Add(key,
-                        new HashSet<StateHandlerInvoker>());
+                        new HashSet<IStateHandlerAbstractionBase>());
 
-                _handlers[transition.HandlerFor].Transitions[key].Add(new StateHandlerInvoker
-                {
-                    Handler = transition.Handler,
-                    HandlerMethod = transition.HandlerMethod
-                });
+                _handlers[transition.HandlerFor].Transitions[key].Add(transition.Handler);
             }
         }
     }
