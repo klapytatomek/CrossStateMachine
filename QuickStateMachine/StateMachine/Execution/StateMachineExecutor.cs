@@ -56,21 +56,7 @@ namespace QuickStateMachine.StateMachine.Execution
             var type = sender.GetType();
             if (!_handlers.ContainsKey(type)) return;
 
-            var handlersToExecute = new List<IStateHandlerBase>();
-            if (_handlers[type].Exits.ContainsKey(_currentStates[sender]))
-                handlersToExecute.AddRange(_handlers[type].Exits[_currentStates[sender]]);
-
-            var key = new KeyValuePair<string, string>(_currentStates[sender], state);
-            if (_handlers[type].Transitions.ContainsKey(key))
-                handlersToExecute.AddRange(_handlers[type].Transitions[key]);
-
-            if (_handlers[type].Enters.ContainsKey(state))
-                handlersToExecute.AddRange(_handlers[type].Enters[state]);
-
-            foreach (var stateHandlerAbstractionBase in handlersToExecute)
-            {
-                stateHandlerAbstractionBase.AbstractExecute(sender);
-            }
+            _handlers[type].Execute(_currentStates[sender], state, sender);
 
             _currentStates[sender] = state;
         }
@@ -125,11 +111,7 @@ namespace QuickStateMachine.StateMachine.Execution
                 if (!_handlers.ContainsKey(enter.HandlerFor))
                     _handlers.Add(enter.HandlerFor, new StateHandlersHolder());
 
-                if (!_handlers[enter.HandlerFor].Enters.ContainsKey(enter.EntersState))
-                    _handlers[enter.HandlerFor].Enters.Add(enter.EntersState,
-                        new HashSet<IStateHandlerBase>());
-
-                _handlers[enter.HandlerFor].Enters[enter.EntersState].Add(enter.Handler);
+                _handlers[enter.HandlerFor].AddEnter(enter.EntersState, enter.Handler);
             }
         }
 
@@ -154,11 +136,7 @@ namespace QuickStateMachine.StateMachine.Execution
                 if (!_handlers.ContainsKey(exit.HandlerFor))
                     _handlers.Add(exit.HandlerFor, new StateHandlersHolder());
 
-                if (!_handlers[exit.HandlerFor].Exits.ContainsKey(exit.ExitState))
-                    _handlers[exit.HandlerFor].Exits.Add(exit.ExitState,
-                        new HashSet<IStateHandlerBase>());
-
-                _handlers[exit.HandlerFor].Exits[exit.ExitState].Add(exit.Handler);
+                _handlers[exit.HandlerFor].AddExit(exit.ExitState, exit.Handler);
             }
         }
 
@@ -185,11 +163,7 @@ namespace QuickStateMachine.StateMachine.Execution
                 if (!_handlers.ContainsKey(transition.HandlerFor))
                     _handlers.Add(transition.HandlerFor, new StateHandlersHolder());
 
-                if (!_handlers[transition.HandlerFor].Transitions.ContainsKey(key))
-                    _handlers[transition.HandlerFor].Transitions.Add(key,
-                        new HashSet<IStateHandlerBase>());
-
-                _handlers[transition.HandlerFor].Transitions[key].Add(transition.Handler);
+                _handlers[transition.HandlerFor].AddTransition(key, transition.Handler);
             }
         }
     }
