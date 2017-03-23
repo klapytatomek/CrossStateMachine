@@ -2,11 +2,11 @@
 
 namespace QuickStateMachine.StateMachine.Abstraction
 {
-    public abstract class StateHandlerBase<T> : IStateHandlerAbstractionBase
+    public abstract class StateHandlerBase<T> : IStateHandlerBase
     {
         public abstract void Execute(T target);
 
-        void IStateHandlerAbstractionBase.AbstractExecute(object target)
+        void IStateHandlerBase.AbstractExecute(object target)
         {
             Execute((T)target);
         }
