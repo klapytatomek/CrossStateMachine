@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
-using QuickStateMachine.StateMachine.Abstraction;
-using QuickStateMachine.StateMachine.Attributes;
+using QuickStateMachine.Abstraction;
+using QuickStateMachine.Attributes;
 
 namespace Sample.States
 {

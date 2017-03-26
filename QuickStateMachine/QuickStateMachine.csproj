@@ -38,15 +38,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StateMachine\Abstraction\IStateHandlerBase.cs" />
-    <Compile Include="StateMachine\Abstraction\StateHandlerBase.cs" />
-    <Compile Include="StateMachine\Attributes\StateMachineEnterStateAttribute.cs" />
-    <Compile Include="StateMachine\Attributes\StateMachineExitStateAttribute.cs" />
-    <Compile Include="StateMachine\Attributes\StateMachineTransition.cs" />
-    <Compile Include="StateMachine\Exceptions\StateMachineNoHandlersFoundException.cs" />
-    <Compile Include="StateMachine\Exceptions\StateMachineNotInitializedException.cs" />
-    <Compile Include="StateMachine\Execution\StateHandlersHolder.cs" />
-    <Compile Include="StateMachine\Execution\StateMachineExecutor.cs" />
+    <Compile Include="Abstraction\IStateHandlerBase.cs" />
+    <Compile Include="Abstraction\StateHandlerBase.cs" />
+    <Compile Include="Attributes\StateMachineEnterStateAttribute.cs" />
+    <Compile Include="Attributes\StateMachineExitStateAttribute.cs" />
+    <Compile Include="Attributes\StateMachineTransition.cs" />
+    <Compile Include="Exceptions\StateMachineNoHandlersFoundException.cs" />
+    <Compile Include="Exceptions\StateMachineNotInitializedException.cs" />
+    <Compile Include="Execution\StateHandlersHolder.cs" />
+    <Compile Include="Execution\StateMachineExecutor.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

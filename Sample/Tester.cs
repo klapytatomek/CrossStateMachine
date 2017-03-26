@@ -1,4 +1,4 @@
-﻿using QuickStateMachine.StateMachine.Execution;
+﻿using QuickStateMachine.Execution;
 
 namespace Sample
 {

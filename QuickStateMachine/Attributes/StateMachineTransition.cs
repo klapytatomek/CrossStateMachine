@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace QuickStateMachine.StateMachine.Attributes
+namespace QuickStateMachine.Attributes
 {
     public class StateMachineTransitionAttribute : Attribute
     {

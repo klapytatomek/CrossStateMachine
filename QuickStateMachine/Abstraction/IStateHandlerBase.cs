@@ -1,4 +1,4 @@
-﻿namespace QuickStateMachine.StateMachine.Abstraction
+﻿namespace QuickStateMachine.Abstraction
 {
     internal interface IStateHandlerBase
     {

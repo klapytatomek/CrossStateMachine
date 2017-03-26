@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using QuickStateMachine.StateMachine.Abstraction;
+using QuickStateMachine.Abstraction;
 
-namespace QuickStateMachine.StateMachine.Execution
+namespace QuickStateMachine.Execution
 {
     internal class StateHandlersHolder
     {

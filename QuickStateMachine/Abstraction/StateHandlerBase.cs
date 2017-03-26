@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace QuickStateMachine.StateMachine.Abstraction
+namespace QuickStateMachine.Abstraction
 {
     public abstract class StateHandlerBase<T> : IStateHandlerBase
     {

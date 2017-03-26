@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace QuickStateMachine.StateMachine.Exceptions
+namespace QuickStateMachine.Exceptions
 {
     public class StateMachineNotInitializedException : Exception
     {
