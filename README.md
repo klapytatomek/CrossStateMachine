@@ -39,11 +39,11 @@ Triggers when object is entering state "to".
 
 # Usage
 
-QuickStateMachine will automaticaly lookup for handlers, but will there is also a chance that it wont find anything. That case call:
+QuickStateMachine will automaticaly lookup for handlers, but there is also a chance that it wont find anything. In that case call:
 ```c#
 StateMachineExecutor.Current.InitializeWithAssembly(assembly);
 ```
-It takes assemlby in which handlers are defined as parameter.
+It takes assembly in which handlers are defined as parameter.
 
 Next step is to make sure to call
 ```c#
@@ -51,10 +51,10 @@ StateMachineExecutor.Current.InitialState(object, state);
 ```
 for every object that will be handled with state machine.
 
-For changing state call
+For changing state call:
 ```c#
 StateMachineExecutor.Current.ChangeState(object, state);
 ```
-it will handle all actions defined with Handler classes for given object.
+It will handle all actions defined with Handler classes for given object.
 
 Remember that state is defined for each object, not class.
