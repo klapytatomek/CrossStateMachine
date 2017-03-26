@@ -2,12 +2,11 @@
 
 QuickStateMachine allows you to handle state machine actions by writing one class per action.
 
+
 # Instalation
 
-Run following command in Package Manager Console
-```c#
-Install-Package QuickStateMachine
-```
+[NuGet](https://www.nuget.org/packages/QuickStateMachine/) -- `nstall-Package QuickStateMachine`
+
 
 # Configuration
 
@@ -36,6 +35,7 @@ Triggered when object transitions from state "from" to state "to".
 [StateMachineEnterState("to", typeof(T))]
 ```
 Triggers when object is entering state "to".
+
 
 # Usage
 
