@@ -174,3 +174,6 @@ trunk/*
 # nuget
 *.nuspec
 *.nupkg
+
+# MFractor
+*.droidres/
