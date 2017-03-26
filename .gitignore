@@ -170,3 +170,7 @@ Projects/Abb.Portal.Web/web.config
 
 trunk/
 trunk/*
+
+# nuget
+*.nuspec
+*.nupkg
