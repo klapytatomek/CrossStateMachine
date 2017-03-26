@@ -5,7 +5,7 @@ QuickStateMachine allows you to handle state machine actions by writing one clas
 
 # Instalation
 
-[NuGet](https://www.nuget.org/packages/QuickStateMachine/) -- `nstall-Package QuickStateMachine`
+[NuGet](https://www.nuget.org/packages/QuickStateMachine/) -- `Install-Package QuickStateMachine`
 
 
 # Configuration
