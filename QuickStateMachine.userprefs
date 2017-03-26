@@ -1,9 +1,11 @@
 ﻿<Properties StartupConfiguration="{41569E97-9787-4CF4-A74C-68615FDC4711}|Default">
-  <MonoDevelop.Ide.Workbench ActiveDocument="QuickStateMachine/StateMachine/Execution/StateHandlersHolder.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Sample/States/TestEnterStateHandler.cs">
     <Files>
       <File FileName="Sample/Tester.cs" Line="1" Column="1" />
-      <File FileName="QuickStateMachine/StateMachine/Execution/StateMachineExecutor.cs" Line="10" Column="2" />
-      <File FileName="QuickStateMachine/StateMachine/Execution/StateHandlersHolder.cs" Line="6" Column="39" />
+      <File FileName="QuickStateMachine/Execution/StateMachineExecutor.cs" Line="74" Column="33" />
+      <File FileName="Sample/States/TestExitStateHandler.cs" Line="7" Column="5" />
+      <File FileName="Sample/States/TestStateTransitionHandler.cs" Line="7" Column="5" />
+      <File FileName="Sample/States/TestEnterStateHandler.cs" Line="7" Column="6" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
