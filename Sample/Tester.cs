@@ -1,4 +1,5 @@
-﻿using QuickStateMachine.Execution;
+﻿using System.Threading.Tasks;
+using QuickStateMachine.Execution;
 
 namespace Sample
 {
@@ -6,10 +7,10 @@ namespace Sample
     {
         public string Name = "tester";
 
-        public void Test()
+        public async Task Test()
         {
-            StateMachineExecutor.Current.InitialState(this, "InitialTestState");
-            StateMachineExecutor.Current.ChangeState(this, "TestState");
+            await StateMachineExecutor.Current.InitialStateAsync(this, "InitialTestState");
+            await StateMachineExecutor.Current.ChangeStateAsync(this, "TestState");
         }
     }
 }

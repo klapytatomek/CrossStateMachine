@@ -1,14 +1,14 @@
-﻿using System;
+﻿using System.Threading.Tasks;
 
 namespace QuickStateMachine.Abstraction
 {
     public abstract class StateHandlerBase<T> : IStateHandlerBase
     {
-        public abstract void Execute(T target);
-
-        void IStateHandlerBase.AbstractExecute(object target)
+        async Task IStateHandlerBase.AbstractExecuteAsync(object target)
         {
-            Execute((T)target);
+            await ExecuteAsync((T) target);
         }
+
+        public abstract Task ExecuteAsync(T target);
     }
 }

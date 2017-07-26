@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 using QuickStateMachine.Abstraction;
 using QuickStateMachine.Attributes;
 using QuickStateMachine.Exceptions;
@@ -15,6 +17,7 @@ namespace QuickStateMachine.Execution
         private Assembly[] _assemblies;
         private Dictionary<Type, StateHandlersHolder> _handlers;
         private bool _isInitialized;
+        private readonly SemaphoreSlim _ss = new SemaphoreSlim(1);
 
         private StateMachineExecutor()
         {
@@ -22,68 +25,69 @@ namespace QuickStateMachine.Execution
                 typeof(string).GetTypeInfo()
                     .Assembly.GetType("System.AppDomain")
                     .GetRuntimeProperty("CurrentDomain")
-                    .GetMethod.Invoke(null, new object[] {});
-            var getassemblies = currentdomain.GetType().GetRuntimeMethod("GetAssemblies", new Type[] {});
-            var assemblies = getassemblies.Invoke(currentdomain, new object[] {}) as Assembly[];
+                    .GetMethod.Invoke(null, new object[] { });
+            var getassemblies = currentdomain.GetType().GetRuntimeMethod("GetAssemblies", new Type[] { });
+            var assemblies = getassemblies.Invoke(currentdomain, new object[] { }) as Assembly[];
             var toLookup =
                 assemblies.ToList()
                     .Where(
                         t =>
                             !t.FullName.Contains("System") &&
                             !t.FullName.Contains("Microsoft") &&
-                            !t.FullName.Contains("mscorlib")).ToArray();
+                            !t.FullName.Contains("mscorlib"))
+                    .ToArray();
             _assemblies = toLookup;
             _currentStates = new Dictionary<object, string>();
         }
 
         public static StateMachineExecutor Current => _current ?? (_current = new StateMachineExecutor());
 
-        public void ChangeState<T>(T sender, string state)
+        public async Task ChangeStateAsync<T>(T sender, string state)
         {
-            lock (this)
-            {
-                if (_isInitialized) return;
-                _isInitialized = true;
-                Initialize();
 
-                if (!_currentStates.ContainsKey(sender))
-                    throw new StateMachineNotInitializedException();
+            if (!_isInitialized)
+                await Initialize();
+            
+            await _ss.WaitAsync();
 
-                if (state.Equals(_currentStates[sender]))
-                    return;
+            if (!_currentStates.ContainsKey(sender))
+                throw new StateMachineNotInitializedException();
 
-                var type = sender.GetType();
-                if (!_handlers.ContainsKey(type)) return;
+            if (state.Equals(_currentStates[sender]))
+                return;
 
-                _handlers[type].Execute(_currentStates[sender], state, sender);
+            var type = sender.GetType();
+            if (!_handlers.ContainsKey(type)) return;
 
+            await _handlers[type].ExecuteAsync(_currentStates[sender], state, sender);
+
+            _currentStates[sender] = state;
+
+            _ss.Release(1);
+        }
+
+        public async Task InitializeWithAssembly(Assembly[] assembly)
+        {
+            _assemblies = assembly;
+            await Initialize();
+        }
+
+        public async Task InitialStateAsync<T>(T sender, string state)
+        {
+            await _ss.WaitAsync();
+
+            if (!_currentStates.ContainsKey(sender))
+                _currentStates.Add(sender, state);
+            else
                 _currentStates[sender] = state;
-            }
+
+            _ss.Release(1);
         }
 
-        public void InitializeWithAssembly(Assembly[] assembly)
+        private async Task Initialize()
         {
-            lock (this)
-            {
-                _assemblies = assembly;
-                _isInitialized = true;
-                Initialize();
-            }
-        }
+            await _ss.WaitAsync();
 
-        public void InitialState<T>(T sender, string state)
-        {
-            lock (this)
-            {
-                if (!_currentStates.ContainsKey(sender))
-                    _currentStates.Add(sender, state);
-                else
-                    _currentStates[sender] = state;
-            }
-        }
-
-        private void Initialize()
-        {
             _handlers = new Dictionary<Type, StateHandlersHolder>();
             CreateEnterStateHandlers();
             CreateExtiStateHandlers();
@@ -91,6 +95,10 @@ namespace QuickStateMachine.Execution
 
             if (_handlers.Count == 0)
                 throw new StateMachineNoHandlersFoundException();
+
+            _isInitialized = true;
+            
+            _ss.Release(1);
         }
 
         private void CreateEnterStateHandlers()
@@ -107,7 +115,8 @@ namespace QuickStateMachine.Execution
                         HandlerFor = enterStateAttribute.Target,
                         Handler = Activator.CreateInstance(type) as IStateHandlerBase
                     };
-                }).ToList();
+                })
+                .ToList();
 
             foreach (var enter in enters)
             {
@@ -132,7 +141,8 @@ namespace QuickStateMachine.Execution
                         HandlerFor = exitStateAttribute.Target,
                         Handler = Activator.CreateInstance(type) as IStateHandlerBase
                     };
-                }).ToList();
+                })
+                .ToList();
 
             foreach (var exit in exits)
             {
@@ -158,7 +168,8 @@ namespace QuickStateMachine.Execution
                         HandlerFor = transitStateAttribute.Target,
                         Handler = Activator.CreateInstance(type) as IStateHandlerBase
                     };
-                }).ToList();
+                })
+                .ToList();
 
             foreach (var transition in transitions)
             {

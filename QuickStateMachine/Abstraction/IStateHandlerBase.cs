@@ -1,7 +1,9 @@
-﻿namespace QuickStateMachine.Abstraction
+﻿using System.Threading.Tasks;
+
+namespace QuickStateMachine.Abstraction
 {
     internal interface IStateHandlerBase
     {
-        void AbstractExecute(object target);
+        Task AbstractExecuteAsync(object target);
     }
 }

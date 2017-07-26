@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using QuickStateMachine.Abstraction;
 
 namespace QuickStateMachine.Execution
@@ -16,7 +17,7 @@ namespace QuickStateMachine.Execution
             _transitions = new Dictionary<KeyValuePair<string, string>, HashSet<IStateHandlerBase>>();
         }
 
-        public void Execute(string exit, string enter, object target)
+        public async Task ExecuteAsync(string exit, string enter, object target)
         {
             var key = new KeyValuePair<string, string>(exit, enter);
 
@@ -31,7 +32,7 @@ namespace QuickStateMachine.Execution
                 handlersToExecute.AddRange(_enters[enter]);
 
             foreach (var stateHandlerAbstractionBase in handlersToExecute)
-                stateHandlerAbstractionBase.AbstractExecute(target);
+                await stateHandlerAbstractionBase.AbstractExecuteAsync(target);
         }
 
         public void AddExit(string key, IStateHandlerBase handler)
