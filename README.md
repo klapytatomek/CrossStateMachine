@@ -15,7 +15,7 @@ Example class:
 [StateMachineExitState("InitialTestState", typeof(Tester))]
     internal class TestExitStateHandler : StateHandlerBase<Tester>
     {
-        public override void Execute(Tester target)
+        public override Task ExecuteAsync(Tester target)
         {
         }
     }
@@ -41,19 +41,19 @@ Triggers when object is entering state "to".
 
 QuickStateMachine will automaticaly lookup for handlers, but there is also a chance that it wont find anything. In that case call:
 ```c#
-StateMachineExecutor.Current.InitializeWithAssembly(assembly);
+StateMachineExecutor.Current.InitializeWithAssemblyAsync(assembly);
 ```
 It takes assembly in which handlers are defined as parameter.
 
 Next step is to make sure to call
 ```c#
-StateMachineExecutor.Current.InitialState(object, state);
+StateMachineExecutor.Current.InitialStateAsync(object, state);
 ```
 for every object that will be handled with state machine.
 
 For changing state call:
 ```c#
-StateMachineExecutor.Current.ChangeState(object, state);
+StateMachineExecutor.Current.ChangeStateAsync(object, state);
 ```
 It will handle all actions defined with Handler classes for given object.
 
